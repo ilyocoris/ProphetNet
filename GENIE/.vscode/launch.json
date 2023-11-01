@@ -1,0 +1,49 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Module",
+            "type": "python",
+            "request": "launch",
+            "module": "torch.distributed.launch",
+            "args": [
+                "--nproc_per_node=4",
+                "--master_port=9421",
+                "--use_env",
+                "${workspaceFolder}/Genie_Finetune.py",
+                "--checkpoint_path=recipes/mask_human/outputs",
+                "--model_channels=128",
+                "--in_channel=128",
+                "--out_channel=128",
+                "--vocab_size=30522",
+                "--config_name=bert-base-uncased",
+                "--token_emb_type=random",
+                "--model_arch=s2s_CAT",
+                "--diffusion_steps=2000",
+                "--predict_xstart",
+                "--noise_schedule=sqrt",
+                "--training_mode=s2s",
+                "--schedule_sampler=loss-second-moment",
+                "--tgt_max_len=64",
+                "--src_max_len=512",
+                "--data_name=mask_human",
+                "--data_path=recipes/",
+                "--lr_anneal_steps=120000",
+                "--batch_size=4",
+                "--lr=5e-05",
+                "--warmup_steps=7200",
+                "--train_type=S2S_Diffusion",
+                "--eval_interval=200",
+                "--log_interval=200",
+                "--save_interva=20000",
+                "--pretrain_model_path=GENIE_ckpt-500w"
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "4,5,6,7"
+            }
+        }
+    ],
+    
+    
+}

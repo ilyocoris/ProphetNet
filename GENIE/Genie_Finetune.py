@@ -5,12 +5,12 @@ from diffusion_util.resample import create_named_schedule_sampler
 from transformers import AutoTokenizer
 import json
 from util import logger
-from train_util import dist_util
+# from train_util import dist_util
 import torch
 import torch.distributed as dist
 from util.util import (
     create_model_and_diffusion,
-    args_to_dict,
+    # args_to_dict,
 )
 import collections
 from data_util.s2s_data_util import load_s2s_data
@@ -128,9 +128,9 @@ def main():
     args = get_arguments()
 
     # out dir set
-    if dist.get_rank() == 0:
-        if not os.path.exists(args.checkpoint_path):
-            os.makedirs(args.checkpoint_path)
+    # if dist.get_rank() == 0:
+    #     if not os.path.exists(args.checkpoint_path):
+    #         os.makedirs(args.checkpoint_path)
     # dist.barrier()
 
     logger.log(f'saving the hyperparameters to {args.checkpoint_path}/training_args.json')

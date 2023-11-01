@@ -1,6 +1,6 @@
 import os
 from util import logger
-from train_util import dist_util
+# from train_util import dist_util
 from util.util import (
     create_model_and_diffusion,
     args_to_dict,
@@ -12,7 +12,7 @@ import argparse
 from transformers import AutoTokenizer
 import numpy as np
 from functools import partial
-from data_util.s2s_data_util import load_s2s_data
+# from data_util.s2s_data_util import load_s2s_data
 import torch.distributed as dist
 from torch.nn.parallel.distributed import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader
@@ -25,7 +25,7 @@ from transformers import (
     BertConfig,
     AutoTokenizer,
 )
-from data_util.text_data_util import load_data_text
+# from data_util.text_data_util import load_data_text
 from tqdm import tqdm
 import random
 
@@ -196,6 +196,7 @@ def setup_env(args):
 def main():
     # env setting
     args = get_arguments()
+    print(args)
     # setup_seed(args.seed)
     setup_env(args)
 
@@ -344,7 +345,7 @@ def main():
                 tgt_input_ids = batch['tgt_input_ids']
                 # print(p_input_ids.shape)
                 src_attention_mask = batch['src_attention_mask']
-                model_kwargs = {'src_input_ids' : src_input_ids, 'src_attention_mask': src_attention_mask}
+                model_kwargs = {'src_input_ids' : src_input_ids.cuda(), 'src_attention_mask': src_attention_mask.cuda()}
 
                 sample = sample_fn(
                     model,
@@ -359,7 +360,7 @@ def main():
                 print("sample result shape: ", sample.shape)
                 print('decoding for e2e... ')
 
-                logits = model.module.get_logits(sample)
+                logits = model.get_logits(sample)
                 cands = torch.topk(logits, k=1, dim=-1)
                 sample_id_list = cands.indices
                 #print("decode id list example :", type(sample_id_list[0]), "  ", sample_id_list[0])
@@ -367,8 +368,13 @@ def main():
                 '''
                 for s2s
                 '''
+                for src, tgt, gen in zip(src_input_ids, tgt_input_ids, sample_id_list):
+                    print("src text: ", clean(tokenizer.decode(src.squeeze())))
+                    print("tgt text: ", clean(tokenizer.decode(tgt.squeeze())))
+                    print("generated query: ", clean(tokenizer.decode(gen.squeeze())))
                 # print("src text: ", tokenizer.decode(src_input_ids.squeeze()))
                 # print("tgt text: ", tokenizer.decode(tgt_input_ids.squeeze()))
+                # print("generated query: ", tokenizer.decode(sample_id_list.squeeze()))
 
                 print("sample control generate query: ")
                 for sample_id in sample_id_list:
