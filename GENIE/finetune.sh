@@ -16,6 +16,6 @@ Genie_Finetune.py \
 --diffusion_steps 2000 --predict_xstart --noise_schedule="sqrt" --training_mode="s2s" \
 --schedule_sampler="loss-second-moment" --tgt_max_len 64 --src_max_len 512 --data_name=$DATA_NAME \
 --data_path=$DATA_PATH \
---lr_anneal_steps 120000 --batch_size 4 --lr 5e-05 --warmup_steps 7200 --train_type="S2S_Diffusion" \
---eval_interval 200 --log_interval 200 --save_interva 20000 \
+--lr_anneal_steps 120000 --batch_size 32 --lr 5e-05 --warmup_steps 7200 --train_type="S2S_Diffusion" \
+--eval_interval 200 --log_interval 200 --save_interval 20000 \
 --pretrain_model_path=$PRETRAIN_CKPT_PATH

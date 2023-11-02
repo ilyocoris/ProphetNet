@@ -95,6 +95,7 @@ def get_arguments():
 
     # muti-gpu
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
+    parser.add_argument("--local-rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
 
@@ -126,6 +127,9 @@ def load_states_from_checkpoint(model_file: str) -> CheckpointState:
 def main():
     # args setting
     args = get_arguments()
+
+    # if args.local-rank != -1: args.local_rank = args.local-rank
+    if args.local_rank != -1: args.local_rank = args.local_rank
 
     # out dir set
     # if dist.get_rank() == 0:

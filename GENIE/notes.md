@@ -1,3 +1,8 @@
+### Environment for 3090 (hrist)
+
+```pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118```
+
+
 ### Download Model
 
 `wget -O genie_ckpt "https://drive.google.com/u/0/uc?id=1-AZssEmgs0QdTp_w8-_4cPi0cV-Hot4N"`
