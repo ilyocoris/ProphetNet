@@ -5,7 +5,7 @@ from diffusion_util.resample import create_named_schedule_sampler
 from transformers import AutoTokenizer
 import json
 from util import logger
-# from train_util import dist_util
+from train_util import dist_util
 import torch
 import torch.distributed as dist
 from util.util import (
@@ -129,7 +129,10 @@ def main():
     args = get_arguments()
 
     # if args.local-rank != -1: args.local_rank = args.local-rank
-    if args.local_rank != -1: args.local_rank = args.local_rank
+    # if args.local_rank != -1: args.local_rank = args.local_rank
+    print("local_rank:", args.local_rank)
+    print("env local-rank:", os.environ['LOCAL_RANK'])
+    args.local_rank = int(os.environ['LOCAL_RANK'])
 
     # out dir set
     # if dist.get_rank() == 0:
@@ -145,7 +148,8 @@ def main():
     set_seed(args.seed)
     # dpp setting
     setup_env(args)
-    # dist_util.setup_dist()
+
+    dist_util.setup_dist()
 
     # logger setting
     log_path = os.path.join(args.checkpoint_path, 'log.txt')

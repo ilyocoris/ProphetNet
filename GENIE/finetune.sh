@@ -2,11 +2,10 @@
 # chmod +x finetune.sh
 # ./finetune.sh
 
-OUT_DIR="recipes/mask_human/outputs"
+OUT_DIR="recipes/mask_30/outputs"
 DATA_PATH="recipes/"
-DATA_NAME="mask_human"
+DATA_NAME="mask_30"
 PRETRAIN_CKPT_PATH="GENIE_ckpt-500w"
-GPU=7
 
 CUDA_VISIBLE_DEVICES=4,5,6,7 python -u -m torch.distributed.launch --nproc_per_node=4 --master_port=9421 \
 Genie_Finetune.py \

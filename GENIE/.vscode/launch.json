@@ -11,7 +11,7 @@
                 "--master_port=9421",
                 "--use_env",
                 "${workspaceFolder}/Genie_Finetune.py",
-                "--checkpoint_path=recipes/mask_human/outputs",
+                "--checkpoint_path=${workspaceFolder}/recipes/mask_human/outputs",
                 "--model_channels=128",
                 "--in_channel=128",
                 "--out_channel=128",
@@ -27,16 +27,16 @@
                 "--tgt_max_len=64",
                 "--src_max_len=512",
                 "--data_name=mask_human",
-                "--data_path=recipes/",
+                "--data_path=${workspaceFolder}/recipes/",
                 "--lr_anneal_steps=120000",
-                "--batch_size=4",
+                "--batch_size=32",
                 "--lr=5e-05",
                 "--warmup_steps=7200",
                 "--train_type=S2S_Diffusion",
                 "--eval_interval=200",
                 "--log_interval=200",
                 "--save_interva=20000",
-                "--pretrain_model_path=GENIE_ckpt-500w"
+                "--pretrain_model_path=${workspaceFolder}/GENIE_ckpt-500w"
             ],
             "console": "integratedTerminal",
             "env": {

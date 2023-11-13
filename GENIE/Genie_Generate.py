@@ -55,6 +55,8 @@ def get_arguments():
     parser.add_argument('--token_emb_type', type=str, default='random', help='token embedding type')
     parser.add_argument("--init_pretrained", default=False, action="store_true",
                         help="Whether to using pretrain BERT encoder")
+    parser.add_argument("--local-rank", type=int, default=-1, help="For distributed training: local_rank")
+
 
     # load diffusion
     # parser.add_argument('--model_arch', type=str, default='transformer', help='Core architecture of diffusion model')
@@ -196,6 +198,7 @@ def setup_env(args):
 def main():
     # env setting
     args = get_arguments()
+    # args.local_rank = int(os.environ['LOCAL_RANK'])
     print(args)
     # setup_seed(args.seed)
     setup_env(args)
