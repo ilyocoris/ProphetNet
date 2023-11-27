@@ -55,6 +55,8 @@ def get_arguments():
     parser.add_argument('--token_emb_type', type=str, default='random', help='token embedding type')
     parser.add_argument("--init_pretrained", default=False, action="store_true",
                         help="Whether to using pretrain BERT encoder")
+    parser.add_argument("--local-rank", type=int, default=-1, help="For distributed training: local_rank")
+
 
     # load diffusion
     # parser.add_argument('--model_arch', type=str, default='transformer', help='Core architecture of diffusion model')
@@ -87,7 +89,6 @@ def get_arguments():
     #
     # muti-gpu
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
-    parser.add_argument("--local-rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
 
@@ -197,6 +198,7 @@ def setup_env(args):
 def main():
     # env setting
     args = get_arguments()
+    # args.local_rank = int(os.environ['LOCAL_RANK'])
     print(args)
     # setup_seed(args.seed)
     setup_env(args)
@@ -331,12 +333,12 @@ def main():
             logger.info("generate_path is None")
             exit(0)
 
-        for epoch in range(args.num_samples - epoch_num):
+        for epoch in [1]:#range(args.num_samples - epoch_num):
             each_sample_list = []
             print("-------------------------------------------------------------")
             print("start sample ", epoch+1+epoch_num, " epoch...")
             print("-------------------------------------------------------------")
-
+            data = []
             for index, batch in enumerate(tqdm(test_dataloader)):
                 '''
                 for s2s
@@ -348,41 +350,66 @@ def main():
                 src_attention_mask = batch['src_attention_mask']
                 model_kwargs = {'src_input_ids' : src_input_ids.cuda(), 'src_attention_mask': src_attention_mask.cuda()}
 
-                sample = sample_fn(
-                    model,
-                    input_shape,
-                    clip_denoised=False,
-                    denoised_fn=partial(denoised_fn_round, args, emb_model.cuda()),
-                    model_kwargs=model_kwargs,
-                    top_p=-1.0,
-                    interval_step=args.interval_step,
-                )
+                # sample = sample_fn(
+                #     model,
+                #     input_shape,
+                #     clip_denoised=False,
+                #     denoised_fn=partial(denoised_fn_round, args, emb_model.cuda()),
+                #     model_kwargs=model_kwargs,
+                #     top_p=-1.0,
+                #     interval_step=args.interval_step,
+                # )
+                
+                for step,sample in enumerate(diffusion.p_sample_loop_progressive(
+                        model,
+                        input_shape,
+                        clip_denoised=False,
+                        denoised_fn=partial(denoised_fn_round, args, emb_model.cuda()),
+                        model_kwargs=model_kwargs,
+                        top_p=-1.0,
+                        interval_step=args.interval_step,
+                        diffusion_start_step=2000,
+                        progress=True,
+                )):
+                    sample = sample["sample"]
 
-                print("sample result shape: ", sample.shape)
-                print('decoding for e2e... ')
+                    # print("sample result shape: ", sample.shape)
+                    # print('decoding for e2e... ')
 
-                logits = model.get_logits(sample)
-                cands = torch.topk(logits, k=1, dim=-1)
-                sample_id_list = cands.indices
-                #print("decode id list example :", type(sample_id_list[0]), "  ", sample_id_list[0])
+                    logits = model.get_logits(sample)
+                    cands = torch.topk(logits, k=1, dim=-1)
+                    sample_id_list = cands.indices
+                    #print("decode id list example :", type(sample_id_list[0]), "  ", sample_id_list[0])
 
-                '''
-                for s2s
-                '''
-                for src, tgt, gen in zip(src_input_ids, tgt_input_ids, sample_id_list):
-                    print("src text: ", clean(tokenizer.decode(src.squeeze())))
-                    print("tgt text: ", clean(tokenizer.decode(tgt.squeeze())))
-                    print("generated query: ", clean(tokenizer.decode(gen.squeeze())))
-                # print("src text: ", tokenizer.decode(src_input_ids.squeeze()))
-                # print("tgt text: ", tokenizer.decode(tgt_input_ids.squeeze()))
-                # print("generated query: ", tokenizer.decode(sample_id_list.squeeze()))
+                    '''
+                    for s2s
+                    '''
+                    # print("diffusion step: " + str(step),end='\r')
+                    for src, tgt, gen in zip(src_input_ids, tgt_input_ids, sample_id_list):
+                        # print("src text: ", clean(tokenizer.decode(src.squeeze())))
+                        # print("tgt text: ", clean(tokenizer.decode(tgt.squeeze())))
+                        # print("generated query: ", clean(tokenizer.decode(gen.squeeze())))
+                    # print("src text: ", tokenizer.decode(src_input_ids.squeeze()))
+                    # print("tgt text: ", tokenizer.decode(tgt_input_ids.squeeze()))
+                    # print("generated query: ", tokenizer.decode(sample_id_list.squeeze()))
 
-                print("sample control generate query: ")
-                for sample_id in sample_id_list:
-                    sentence = tokenizer.decode(sample_id.squeeze())
-                    each_sample_list.append(clean(sentence))
-                    # print(sentence)
+                        data.append({
+                            "step": step,
+                            "src":clean(tokenizer.decode(src.squeeze())),
+                            "tgt":clean(tokenizer.decode(tgt.squeeze())),
+                            "gen":clean(tokenizer.decode(gen.squeeze())),
+                            "ids":gen.squeeze().tolist()
+                        })
 
+                    # print("sample control generate query: ")
+                    for sample_id in sample_id_list:
+                        sentence = tokenizer.decode(sample_id.squeeze())
+                        each_sample_list.append(clean(sentence))
+                        # print(sentence)
+            # save data to a csv
+            import pandas as pd
+            df = pd.DataFrame(data)
+            df.to_csv(os.path.join(args.generate_path, "diff_steps_2000_ids.csv"), index=False)
             # total_sample_list.append(each_sample_list)
             out_path = os.path.join(args.generate_path, "rank" + str(dist.get_rank()) + "_gen_seed_101" +
                                     "_num" + str(args.num_samples) + "_epoch" + str(epoch + 1 + epoch_num) + ".txt")
