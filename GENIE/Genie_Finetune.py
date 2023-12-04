@@ -95,6 +95,7 @@ def get_arguments():
 
     # muti-gpu
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
+    parser.add_argument("--local-rank", type=int, default=-1, help="For distributed training: local_rank")
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
 
@@ -128,9 +129,9 @@ def main():
     args = get_arguments()
 
     # out dir set
-    if dist.get_rank() == 0:
-        if not os.path.exists(args.checkpoint_path):
-            os.makedirs(args.checkpoint_path)
+    # if dist.get_rank() == 0:
+    if not os.path.exists(args.checkpoint_path):
+        os.makedirs(args.checkpoint_path)
     # dist.barrier()
 
     logger.log(f'saving the hyperparameters to {args.checkpoint_path}/training_args.json')

@@ -207,7 +207,7 @@ def main():
 
     args = get_arguments()
     tgt = []
-    test_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/test.tgt")
+    test_tgt_path = os.path.join(args.data_path, args.data_name + "/test.tgt")
     with open(test_tgt_path, "r", encoding="utf-8") as ifile:
         for line in tqdm(ifile):
             line = line.strip()

@@ -24,3 +24,7 @@ class AlgorithmicTokenizer(PreTrainedTokenizer):
     def _convert_id_to_token(self, index):
         # Convert an ID to its corresponding token in the vocabulary
         return list(self.vocab.keys())[index]
+
+def get_algorithmic_tokenizer(vocab = ["[SEP]", "[CLS]", "[UNK]", "[PAD]", "+", "-", "*", "p", "q", "r", "s", "t", "m"] + [str(n) for n in list(range(0,113))]):
+    return AlgorithmicTokenizer(vocab=vocab, unk_token="[UNK]", pad_token="[PAD]")
+    

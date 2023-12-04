@@ -1,4 +1,4 @@
-from model.Diffusion_LM import Diffusion_LM, CrossAttention_Diffusion_LM
+from model.Diffusion_LM import Diffusion_LM, CrossAttention_Diffusion_LM, Tiny_CAS_Diffusion_LM
 from diffusion_util import gaussian_diffusion as gd
 from diffusion_util.respace import SpacedDiffusion, space_timesteps
 from diffusion_util.gaussian_diffusion import GaussianDiffusion
@@ -70,6 +70,18 @@ def create_model(
     elif model_arch == 's2s_CAT':
 
         return CrossAttention_Diffusion_LM(
+            in_channels=in_channel,
+            model_channels=model_channels,
+            out_channels=(out_channel if not learn_sigma else out_channel * 2),
+            dropout=dropout,
+            config_name=config_name,
+            vocab_size=vocab_size,
+            logits_mode=logits_mode,
+            init_pretrained=init_pretrained,
+            token_emb_type=token_emb_type,
+        )
+    elif model_arch == 'tiny_CAT':
+        return Tiny_CAS_Diffusion_LM(
             in_channels=in_channel,
             model_channels=model_channels,
             out_channels=(out_channel if not learn_sigma else out_channel * 2),

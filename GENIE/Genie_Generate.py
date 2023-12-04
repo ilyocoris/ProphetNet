@@ -19,6 +19,8 @@ from torch.utils.data import DataLoader
 from data_util.s2s_data_util import S2S_dataset, QG_dataset_Diff
 from torch.serialization import default_restore_location
 
+from algorithmic.utils.algorithmic_tokenizer import get_algorithmic_tokenizer
+
 
 from transformers import (
     BertModel,
@@ -87,6 +89,8 @@ def get_arguments():
     #
     # muti-gpu
     parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
+    parser.add_argument("--local-rank", type=int, default=-1, help="For distributed training: local_rank")
+
     parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
     parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
 
@@ -265,26 +269,30 @@ def main():
             sentence = tokenizer.decode(sample_id.squeeze())
             print(sentence)
 
-    elif args.model_arch == 's2s_CAT':
+    elif args.model_arch == 's2s_CAT' or args.model_arch == 'tiny_CAT':
 
         # bert tokenizer
-        tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+        if args.model_arch == "tiny_CAT":
+            logger.log("creating algorithmic tokenizer...")
+            tokenizer = get_algorithmic_tokenizer()
+        else:
+            tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
         print("-------------------------------------------------------------")
         print("start generate query from dev dataset, for every passage, we generate ", args.num_samples, " querys...")
         print("-------------------------------------------------------------")
 
         print("***** load " + args.data_name + " test src dataset*****")
         src = []
-        test_src_path = os.path.join(args.data_path, args.data_name + "/org_data/test.src")
+        test_src_path = os.path.join(args.data_path, args.data_name + "/test.src")
         with open(test_src_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
                 text = line
                 src.append(text)
 
-        print("***** load " + args.data_name + " dev tgt dataset*****")
+        print("***** load " + args.data_name + " test tgt dataset*****")
         tgt = []
-        test_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/test.tgt")
+        test_tgt_path = os.path.join(args.data_path, args.data_name + "/test.tgt")
         with open(test_tgt_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -346,6 +354,10 @@ def main():
                 src_attention_mask = batch['src_attention_mask']
                 model_kwargs = {'src_input_ids' : src_input_ids, 'src_attention_mask': src_attention_mask}
 
+                # model kwars to same device as model
+                for k, v in model_kwargs.items():
+                    model_kwargs[k] = v.to(args.device)
+
                 sample = sample_fn(
                     model,
                     input_shape,
@@ -359,7 +371,8 @@ def main():
                 print("sample result shape: ", sample.shape)
                 print('decoding for e2e... ')
 
-                logits = model.module.get_logits(sample)
+                # logits = model.module.get_logits(sample)
+                logits = model.get_logits(sample)
                 cands = torch.topk(logits, k=1, dim=-1)
                 sample_id_list = cands.indices
                 #print("decode id list example :", type(sample_id_list[0]), "  ", sample_id_list[0])

@@ -12,7 +12,7 @@ def load_s2s_data(args, padding_mode, split, tokenizer):
     if split == 'train':
         print("***** load " + args.data_name + " train src dataset*****")
         src = []
-        train_src_path = os.path.join(args.data_path, args.data_name + "/org_data/train.src")
+        train_src_path = os.path.join(args.data_path, args.data_name + "/train.src")
         with open(train_src_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -21,7 +21,7 @@ def load_s2s_data(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " train tgt dataset*****")
         tgt = []
-        train_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/train.tgt")
+        train_tgt_path = os.path.join(args.data_path, args.data_name + "/train.tgt")
         with open(train_tgt_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -32,7 +32,7 @@ def load_s2s_data(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " dev src dataset*****")
         src = []
-        dev_src_path = os.path.join(args.data_path, args.data_name + "/org_data/dev.src")
+        dev_src_path = os.path.join(args.data_path, args.data_name + "/dev.src")
         with open(dev_src_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -41,7 +41,7 @@ def load_s2s_data(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " dev tgt dataset*****")
         tgt = []
-        dev_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/dev.tgt")
+        dev_tgt_path = os.path.join(args.data_path, args.data_name + "/dev.tgt")
         with open(dev_tgt_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -52,7 +52,7 @@ def load_s2s_data(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " test src dataset*****")
         src = []
-        test_src_path = os.path.join(args.data_path, args.data_name + "/org_data/test.src")
+        test_src_path = os.path.join(args.data_path, args.data_name + "/test.src")
         with open(test_src_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -61,7 +61,7 @@ def load_s2s_data(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " dev tgt dataset*****")
         tgt = []
-        test_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/test.tgt")
+        test_tgt_path = os.path.join(args.data_path, args.data_name + "/test.tgt")
         with open(test_tgt_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -101,7 +101,7 @@ def load_s2s_data_AR(args, padding_mode, split, tokenizer):
     if split == 'train':
         print("***** load " + args.data_name + " train src dataset*****")
         src = []
-        train_src_path = os.path.join(args.data_path, args.data_name + "/org_data/train.src")
+        train_src_path = os.path.join(args.data_path, args.data_name + "/train.src")
         with open(train_src_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -110,7 +110,7 @@ def load_s2s_data_AR(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " train tgt dataset*****")
         tgt = []
-        train_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/train.tgt")
+        train_tgt_path = os.path.join(args.data_path, args.data_name + "/train.tgt")
         with open(train_tgt_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -121,7 +121,7 @@ def load_s2s_data_AR(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " dev src dataset*****")
         src = []
-        dev_src_path = os.path.join(args.data_path, args.data_name + "/org_data/dev.src")
+        dev_src_path = os.path.join(args.data_path, args.data_name + "/dev.src")
         with open(dev_src_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -130,7 +130,7 @@ def load_s2s_data_AR(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " dev tgt dataset*****")
         tgt = []
-        dev_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/dev.tgt")
+        dev_tgt_path = os.path.join(args.data_path, args.data_name + "/dev.tgt")
         with open(dev_tgt_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -143,7 +143,7 @@ def load_s2s_data_AR(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " test src dataset*****")
         src = []
-        test_src_path = os.path.join(args.data_path, args.data_name + "/org_data/test.src")
+        test_src_path = os.path.join(args.data_path, args.data_name + "/test.src")
         with open(test_src_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
@@ -152,7 +152,7 @@ def load_s2s_data_AR(args, padding_mode, split, tokenizer):
 
         print("***** load " + args.data_name + " dev tgt dataset*****")
         tgt = []
-        test_tgt_path = os.path.join(args.data_path, args.data_name + "/org_data/test.tgt")
+        test_tgt_path = os.path.join(args.data_path, args.data_name + "/test.tgt")
         with open(test_tgt_path, "r", encoding="utf-8") as ifile:
             for line in tqdm(ifile):
                 line = line.strip()
