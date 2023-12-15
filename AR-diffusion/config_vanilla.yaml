@@ -1,10 +1,17 @@
 model:
-  name: null  # facebook/bart-base / bert-base-uncased
-  mode: s2s
+  # name: bert-base-uncased  # facebook/bart-base / bert-base-uncased
+  mode: vanilla
   pretrain: null
-  # i added these to control the depth of the denoiser
-  custom_denoiser: False
-  denoiser_layers: 6
+
+encoder:
+  layers: 1
+  num_attention_heads: 4
+  att_dropout: 0.1
+
+denoiser:
+  layers: 1
+  num_attention_heads: 4
+  att_dropout: 0.1
 
 exp:
   seed: 101
@@ -23,14 +30,15 @@ in_channels: 64
 out_channels: 64
 diffusion_steps: 2000
 
-tgt_len: 54  # iwslt14->100 / commengen->54 / cnndm->? / xsum->150
-max_pos_len: 256  # iwslt14->256 / commengen->128 / cnndm->? / xsum->512
+tgt_len: 128  # iwslt14->100 / commengen->54 / cnndm->? / xsum->150
+max_pos_len: 512  # iwslt14->256 / commengen->128 / cnndm->? / xsum->512
 
 src_lang: de
 tgt_lang: en
 
 intermediate_size: 1024
 num_attention_heads: 4
+hidden_size: 256
 
 fairseq:
   use_fairseq: False

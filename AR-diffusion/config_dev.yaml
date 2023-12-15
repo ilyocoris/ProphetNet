@@ -2,7 +2,6 @@ model:
   name: null  # facebook/bart-base / bert-base-uncased
   mode: s2s
   pretrain: null
-  # i added these to control the depth of the denoiser
   custom_denoiser: False
   denoiser_layers: 6
 

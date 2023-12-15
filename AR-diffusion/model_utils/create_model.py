@@ -4,7 +4,7 @@ import torch.distributed as dist
 import model_utils.gaussian_diffusion as gd
 
 from model_utils.gaussian_diffusion import GaussianDiffusion
-from model_utils.diffusion_lm import CrossAttention_Diffusion_LM
+from model_utils.diffusion_lm import CrossAttention_Diffusion_LM, Vanilla_CrossAttention_Diffusion_LM
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,12 @@ def create_model(config, vocab_size):
 
     if config.model.mode == 's2s':
         return CrossAttention_Diffusion_LM(
+            config=config,
+            vocab_size = vocab_size,
+            out_channels=(config.out_channels if not config.learn_sigma else config.out_channels * 2),
+        )
+    elif config.model.mode == 'vanilla':
+        return Vanilla_CrossAttention_Diffusion_LM(
             config=config,
             vocab_size = vocab_size,
             out_channels=(config.out_channels if not config.learn_sigma else config.out_channels * 2),

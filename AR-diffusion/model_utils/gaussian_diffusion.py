@@ -364,7 +364,7 @@ class GaussianDiffusion:
         if self.config.schedule_sampler == 'uniform':
             assert t.shape == (B,)
 
-        model_output, _ = model(x, self._scale_timesteps(t), x_self_cond=self_cond, **model_kwargs)
+        model_output, out2 = model(x, self._scale_timesteps(t), x_self_cond=self_cond, **model_kwargs)
 
         # Learning Variance
         if self.model_var_type in [ModelVarType.LEARNED, ModelVarType.LEARNED_RANGE]:
@@ -430,6 +430,7 @@ class GaussianDiffusion:
         assert (
             model_mean.shape == model_log_variance.shape == pred_xstart.shape == x.shape
         )
+        # save model_output for debugging as json
         return {
             "mean": model_mean,
             "variance": model_variance,

@@ -13,7 +13,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data.distributed import DistributedSampler
 
-from data_utils.fairseq_dataset import load_fairseq
+# from data_utils.fairseq_dataset import load_fairseq
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +96,20 @@ def load_jsonl_data(config, attri):
         src_path = os.path.join(config.data.path, config.data.name, attri + '.src')
         tgt_path = os.path.join(config.data.path, config.data.name, attri + '.tgt')
 
+        src_data = open(src_path, 'r')
+        tgt_data = open(tgt_path, 'r')
+        for src, tgt in zip(src_data, tgt_data):
+            data.append({
+                'src': src.strip('\n'),
+                'tgt': tgt.strip('\n'),
+            })
+        src_data.close()
+        tgt_data.close()
+
+    else:
+        # Expected a split.src and split.tgt with a sentence to sentence correspondence 
+        src_path = os.path.join(config.data.path, config.data.name, attri + '.src')
+        tgt_path = os.path.join(config.data.path, config.data.name, attri + '.tgt')
         src_data = open(src_path, 'r')
         tgt_data = open(tgt_path, 'r')
         for src, tgt in zip(src_data, tgt_data):

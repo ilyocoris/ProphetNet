@@ -71,7 +71,7 @@ def split_data(data, log=False):
     return data_piece
 
 
-@hydra.main(version_base=None, config_path="../", config_name="config")
+@hydra.main(version_base=None, config_path="", config_name="config")
 def main(config):
     local_rank = int(os.environ["LOCAL_RANK"])
     config.exp.dir = os.path.join(config.exp.root, config.data.name, config.exp.name)
@@ -154,7 +154,7 @@ def main(config):
         sample_fn = (diffusion.p_sample_loop)
 
     if dist.get_world_size() > 1:
-        emb_model = model.module.word_embedding
+        emb_model = model.word_embedding
     else:
         emb_model = model.word_embedding
 
@@ -192,14 +192,14 @@ def main(config):
 
             for _, batch in enumerate(tqdm(dev_dataloader)):
                 with torch.no_grad():
-                    encoder_hidden_states = model.module.encoder(
+                    encoder_hidden_states = model.encoder(
                         input_ids=batch['src_input_ids'].cuda(), 
                         attention_mask=batch['src_attention_mask'].cuda(),
                     ).last_hidden_state  # [bs, seq_len, hz]
 
                 if config.pred_len:
                     with torch.no_grad():
-                        length_out = model.module.get_pred_len(
+                        length_out = model.get_pred_len(
                             encoder_hidden_states=encoder_hidden_states,
                             src_masks=batch['src_attention_mask'].cuda(),
                             normalize=True,
@@ -220,7 +220,7 @@ def main(config):
                         batch['src_input_ids'].shape[0], config.tgt_len, config.in_channels,
                     )
 
-                model_kwargs = {'src_attention_mask': batch['src_attention_mask'],
+                model_kwargs = {'src_attention_mask': batch['src_attention_mask'].cuda(),
                                 'tgt_attention_mask': tgt_attention_mask,
                                 'encoder_hidden_states': encoder_hidden_states,}
 
@@ -241,7 +241,7 @@ def main(config):
                     logger.info(f"sample result shape: {sample.shape}")  # (bs, seq_len, emb_dim)
                     print('decoding for e2e... ')
 
-                logits = model.module.get_logits(sample)  # (bs, seq_len, vocab_size)
+                logits = model.get_logits(sample)  # (bs, seq_len, vocab_size)
                 sample_id_tensor = torch.argmax(logits, dim=-1)
 
                 if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok'] and (not config.use_mbert):

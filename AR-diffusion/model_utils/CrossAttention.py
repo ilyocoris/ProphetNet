@@ -125,10 +125,10 @@ class CrossAttention(nn.Module):
         att_strategy=None,
     ):
         super().__init__()
+        self.is_cross_attention = cross_attention_dim is None
         self.att_strategy = att_strategy
         self.inner_dim = dim_head * heads
         cross_attention_dim = cross_attention_dim if cross_attention_dim is not None else query_dim
-
         self.scale = dim_head**-0.5
         self.heads = heads
         self.dim_head = dim_head
@@ -142,6 +142,8 @@ class CrossAttention(nn.Module):
         self.to_out = nn.ModuleList([])
         self.to_out.append(nn.Linear(self.inner_dim, query_dim))
         self.to_out.append(nn.Dropout(dropout))
+
+        self.attention_probs = None
 
     def reshape_heads_to_batch_dim(self, tensor, time_embeddings=None):
         batch_size, seq_len, dim = tensor.shape
@@ -205,14 +207,13 @@ class CrossAttention(nn.Module):
             key_padding_mask = torch.repeat_interleave(key_padding_mask, self.heads, 0)
         elif tgt_padding_mask is not None:
             tgt_padding_mask = torch.repeat_interleave(tgt_padding_mask, self.heads, 0)
-
         hidden_states = self._attention(query, key, value,
                                         key_padding_mask=key_padding_mask, 
                                         tgt_padding_mask=tgt_padding_mask,
                                         time_embeddings=time_embeddings,
                                         r_w_bias=r_w_bias,
                                         r_r_bias=r_r_bias,)
-
+        
         # linear proj
         hidden_states = self.to_out[0](hidden_states)
         # dropout
@@ -256,6 +257,10 @@ class CrossAttention(nn.Module):
             )
         
         attention_probs = attention_scores.softmax(dim=-1)
+
+        # store attention weights to experiment later
+        self.attention_probs = attention_probs
+
         attention_probs = self.dropatt(attention_probs)
         
         # compute attention output
