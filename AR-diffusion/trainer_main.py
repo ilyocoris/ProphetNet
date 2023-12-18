@@ -4,8 +4,9 @@ import logging
 
 import torch.distributed as dist
 
+from tokenizers import Tokenizer
 from sacremoses import MosesTokenizer
-from transformers import set_seed, AutoTokenizer
+from transformers import set_seed, AutoTokenizer, PreTrainedTokenizerFast
 
 # from train_utils.pretrain import PretrainLoop
 from train_utils.trainer import TrainLoop
@@ -23,7 +24,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@hydra.main(version_base=None, config_path=".", config_name="config")
+@hydra.main(version_base=None, config_path=".", config_name="config_recipes")
 def main(config):
     local_rank = int(os.environ["LOCAL_RANK"])
 
@@ -37,28 +38,34 @@ def main(config):
     set_seed(config.exp.seed + int(dist.get_rank()))  # seed setting
     
     # load tokenizer
-    if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
-        tokenizer = None
-        if config.use_bpe:
-            tokenizer = create_tokenizer(path=f'./data/{config.data.name}/')
-        elif config.use_mbert:
-            tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
+    if config.tokenizer.from_pretrained:
+        tokenizer = AutoTokenizer.from_pretrained(config.tokenizer.name_or_path)
     else:
-        if config.use_sentence_piece:
-            tokenizer = AutoTokenizer.from_pretrained('t5-base')
-        else:
-            tokenizer = AutoTokenizer.from_pretrained(config.model.name)
-            
-    if tokenizer == None:
-        vocab_size = config.vocab_size
-    else:
-        vocab_size = tokenizer.vocab_size
-        if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
-            if config.use_bpe:
-                config.pad_value = tokenizer.get_vocab()['<pad>']
-            # else use by fairseq
-        else:
-            config.pad_value = tokenizer.pad_token_id
+        tokenizer = PreTrainedTokenizerFast(tokenizer_file=config.tokenizer)
+        tokenizer.pad_token = "[PAD]"
+        
+    # if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
+    #     tokenizer = None
+    #     if config.use_bpe:
+    #         tokenizer = create_tokenizer(path=f'./data/{config.data.name}/')
+    #     elif config.use_mbert:
+    #         tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
+    # else:
+    #     if config.use_sentence_piece:
+    #         tokenizer = AutoTokenizer.from_pretrained('t5-base')
+    #     else:
+    #         tokenizer = AutoTokenizer.from_pretrained(config.model.name)
+    vocab_size = config.vocab_size       
+    # if tokenizer == None:
+    #     vocab_size = config.vocab_size
+    # else:
+    #     vocab_size = tokenizer.vocab_size
+    #     if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
+    #         if config.use_bpe:
+    #             config.pad_value = tokenizer.get_vocab()['<pad>']
+    #         # else use by fairseq
+    #     else:
+    #         config.pad_value = tokenizer.pad_token_id
 
     # load model (predict Guassian noise) and diffusion basic class
     model, diffusion = create_model(config, vocab_size), create_gaussian_diffusion(config)

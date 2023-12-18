@@ -24,6 +24,7 @@ def create_model(config, vocab_size):
             out_channels=(config.out_channels if not config.learn_sigma else config.out_channels * 2),
         )
     elif config.model.mode == 'vanilla':
+        logger.info(f'creating vanilla model with {config.encoder.layers} encoder layers and {config.denoiser.layers} denoiser layers')
         return Vanilla_CrossAttention_Diffusion_LM(
             config=config,
             vocab_size = vocab_size,

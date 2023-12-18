@@ -3,53 +3,58 @@ model:
   mode: vanilla
   pretrain: null
 
-tokenizer: "data/raw/sequence/identity/tokenizer_1000.json"
+tokenizer:
+  from_pretrained: True
+  name_or_path: "bert-base-uncased"
 
 encoder:
   # this will overwrite hidden dim to 768
-  initialize_from_pretrained: True
-  layers: 1
-  num_attention_heads: 2
+  initialize_from_pretrained: False
+  layers: 6
+  num_attention_heads: 4
   att_dropout: 0.1
+# whether to train the encoder
+fix_encoder: False
 
 denoiser:
-  layers: 1
+  layers: 6
   num_attention_heads: 4
   att_dropout: 0.1
 
 exp:
   seed: 101
   root: ./my_output
-  name: id_e1_d1_c64
+  name: ebert_d6_c128
   dir: null
 
 device: cuda
 
 data:
-  path: data/raw/sequence
-  name: identity
+  path: data/raw
+  name: recipes
 
-time_channels: 64
-in_channels: 64
-out_channels: 64
+time_channels: 128
+in_channels: 128
+out_channels: 128
 diffusion_steps: 2000
 
-tgt_len: 24  # iwslt14->100 / commengen->54 / cnndm->? / xsum->150
-max_pos_len: 24  # iwslt14->256 / commengen->128 / cnndm->? / xsum->512
+tgt_len: 128  # iwslt14->100 / commengen->54 / cnndm->? / xsum->150
+max_pos_len: 512  # iwslt14->256 / commengen->128 / cnndm->? / xsum->512
 
 src_lang: de
 tgt_lang: en
 
-intermediate_size: 1024
+intermediate_size: 3072
 num_attention_heads: 4
-hidden_size: 256
+hidden_size: 768
 
 fairseq:
   use_fairseq: False
   real_data: False
   dist_data: False
 
-vocab_size: 1000
+# bert vocab size
+vocab_size: 30522
 
 use_mbert: False  # mt 
 use_bpe: False  # mt 
@@ -60,16 +65,16 @@ num_workers: 4  # bpe->4
 lr_step: 40000
 warmup_steps: 4000
 total_steps: 60000
-batch_size: 256
-lr: 2e-4
+batch_size: 4096
+lr: 8e-4
 weight_decay: 0.0
 grad_clip: -1.0
 ema_rate: 0.9999
 grad_accum: 1
 
-eval_interval: 2000
-log_interval: 500
-save_interval: 10000
+eval_interval: 3000
+log_interval: 1000
+save_interval: 15000
 
 #*************************************
 # something can change
@@ -80,6 +85,7 @@ label_smooth: 0.0
 scale_embedding: False
 
 continue_train: False
+# TODO: what is this? automatic mixed precision
 use_AMP: False
 grad_penalty: False
 loss_aware: False
@@ -89,7 +95,7 @@ init_weight: False
 prediction: False
 pred_len_strategy: null  # token_embed / mean_pool
 
-att_strategy: null  # txl / rotary / null
+att_strategy: txl #null  # txl / rotary / null
 rel_postion: False
 position_att: False
 time_att: False
@@ -121,7 +127,6 @@ load_encoder: False
 predict_x_start: False
 load_bart: False
 use_kl: False
-fix_encoder: False
 learn_pos: False
 
 sigma_small: False

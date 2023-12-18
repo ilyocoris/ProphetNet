@@ -250,14 +250,27 @@ class Vanilla_CrossAttention_Diffusion_LM(nn.Module):
         # model_cfg.hidden_dropout_prob = config.dropout
         # model_cfg.attention_probs_dropout_prob = config.att_dropout
         self.hidden_size = config.hidden_size
-
+        # print(config)
+        # Encoder Config
         encoder_cfg = AutoConfig.from_pretrained("bert-base-uncased")
         encoder_cfg.vocab_size = config.vocab_size
-        encoder_cfg.hidden_size = config.hidden_size
+        # encoder_cfg.hidden_size = config.hidden_size
         encoder_cfg.num_hidden_layers = config.encoder.layers
         encoder_cfg.num_attention_heads = config.encoder.num_attention_heads
-        
-        self.encoder = BertModel(config=encoder_cfg)
+        # Load pretrained bert encoder
+        if config.encoder.initialize_from_pretrained:
+            logger.info("Load pretrained bert encoder.")
+            self.encoder = BertModel.from_pretrained(
+                "bert-base-uncased", 
+                config=encoder_cfg, 
+                # ignore_mismatched_sizes=True
+            )
+            
+        else:
+            # Dry encoder (random parameters)
+            encoder_cfg.hidden_size = config.hidden_size
+            self.encoder = BertModel(config=encoder_cfg)
+
 
         if (input_size != self.hidden_size) or (self.config.self_condition):
             # input transform layer
