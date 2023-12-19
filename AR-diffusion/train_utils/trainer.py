@@ -107,7 +107,7 @@ class TrainLoop:
             print("single GPU is not achieve now")
             exit(0)
 
-        if config.fix_encoder:
+        if config.encoder.is_frozen:
             model_cfg = AutoConfig.from_pretrained(config.model.name)
             self.encoder = AutoModel.from_pretrained(config.model.name, config=model_cfg)
             if config.load_bart:

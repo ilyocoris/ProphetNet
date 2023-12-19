@@ -8,7 +8,7 @@
 # DATA_NAME="identity"
 # STEP=50000
 
-CUDA_VISIBLE_DEVICES=5,6 torchrun --nproc_per_node=2 --nnodes=1 --master_port 6901 trainer_main.py #\``
+CUDA_VISIBLE_DEVICES=4,6 torchrun --nproc_per_node=2 --nnodes=1 --master_port 6900 trainer_main.py #\``
 # model.name='bert-base-uncased' batch_size=64 grad_accum=3 \
 # total_steps=$STEP exp.name=$FILE_NAME \
 # data.name=$DATA_NAME data.path=$DATA_PATH tgt_len=128 max_pos_len=512 lr=8e-4 lr_step=40000 \

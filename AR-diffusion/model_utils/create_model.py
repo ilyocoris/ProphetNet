@@ -17,7 +17,7 @@ def create_model(config, vocab_size):
         logger.info(f'rescaling timesteps {config.rescale_timesteps}')
         logger.info(f'using self condition {config.self_condition}')
         logger.info(f'learning time position {config.learn_pos}')
-        logger.info(f'fixing encoder {config.fix_encoder}')
+        logger.info(f'fixing encoder {config.encoder.is_frozen}')
 
 
     if config.model.mode == 's2s':

@@ -1,5 +1,35 @@
+
+# Output Path
+exp:
+  seed: 101
+  root: ./my_output
+  name: eb1_d1_c128_wd01
+  dir: null
+
+# Data
+data:
+  path: data/raw/modulus
+  name: +
+tgt_len: 8
+max_pos_len: 8
+
+# Training Basics
+batch_size: 256
+device: cuda
+lr_step: 40000
+warmup_steps: 4000
+total_steps: 60000
+lr: 8e-4
+weight_decay: 0.1
+grad_clip: -1.0
+ema_rate: 0.9999
+grad_accum: 1
+eval_interval: 3000
+log_interval: 1000
+save_interval: 15000
+
+# Model
 model:
-  # name: bert-base-uncased  # facebook/bart-base / bert-base-uncased
   mode: s2s
   pretrain: null
 
@@ -9,73 +39,47 @@ tokenizer:
 
 encoder:
   # this will overwrite hidden dim to 768
-  initialize_from_pretrained: False
+  initialize_from_pretrained: True
   layers: 1
   num_attention_heads: 4
   att_dropout: 0.1
-# whether to train the encoder
-fix_encoder: False
+  is_frozen: False # old fix_encoder
 
 denoiser:
   layers: 1
   num_attention_heads: 4
   att_dropout: 0.1
 
-batch_size: 256
-
-exp:
-  seed: 101
-  root: ./my_output
-  name: eb1_d1_c128_wd01
-  dir: null
-
-device: cuda
-
-data:
-  path: data/raw/sequence
-  name: identity
-
 time_channels: 128
 in_channels: 128
 out_channels: 128
 diffusion_steps: 2000
 
-tgt_len: 24  # iwslt14->100 / commengen->54 / cnndm->? / xsum->150
-max_pos_len: 24  # iwslt14->256 / commengen->128 / cnndm->? / xsum->512
-
-src_lang: de
-tgt_lang: en
-
+vocab_size: 30522
 intermediate_size: 3072
 num_attention_heads: 4
 hidden_size: 768
+
+# Diffusion
+schedule_sampler: uniform  # uniform / xy_uniform / xy3_uniform / loss-second-moment
+
+
+# *********** Random parameters  ***********
+
+# src_lang: de
+# tgt_lang: en
 
 fairseq:
   use_fairseq: False
   real_data: False
   dist_data: False
-
-# bert vocab size
-vocab_size: 30522
-
 use_mbert: False  # mt 
 use_bpe: False  # mt 
 pad_value: 0  # mt
 num_workers: 4  # bpe->4
 
 # training params
-lr_step: 40000
-warmup_steps: 4000
-total_steps: 60000
-lr: 8e-4
-weight_decay: 0.1
-grad_clip: -1.0
-ema_rate: 0.9999
-grad_accum: 1
 
-eval_interval: 3000
-log_interval: 1000
-save_interval: 15000
 
 #*************************************
 # something can change
@@ -102,7 +106,6 @@ position_att: False
 time_att: False
 infer_self_condition: False
 self_condition: False
-schedule_sampler: uniform  # uniform / xy_uniform / xy3_uniform / loss-second-moment
 end_point_scale: 2.0
 dropout: 0.1
 att_dropout: 0.1

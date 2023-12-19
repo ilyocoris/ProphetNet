@@ -24,7 +24,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@hydra.main(version_base=None, config_path=".", config_name="config_recipes")
+@hydra.main(version_base=None, config_path=".", config_name="config")
 def main(config):
     local_rank = int(os.environ["LOCAL_RANK"])
 
