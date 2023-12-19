@@ -1,6 +1,6 @@
 model:
   # name: bert-base-uncased  # facebook/bart-base / bert-base-uncased
-  mode: vanilla
+  mode: s2s
   pretrain: null
 
 tokenizer:
@@ -10,36 +10,38 @@ tokenizer:
 encoder:
   # this will overwrite hidden dim to 768
   initialize_from_pretrained: False
-  layers: 6
+  layers: 1
   num_attention_heads: 4
   att_dropout: 0.1
 # whether to train the encoder
 fix_encoder: False
 
 denoiser:
-  layers: 6
+  layers: 1
   num_attention_heads: 4
   att_dropout: 0.1
+
+batch_size: 256
 
 exp:
   seed: 101
   root: ./my_output
-  name: ebert_d6_c128
+  name: eb1_d1_c128_wd01
   dir: null
 
 device: cuda
 
 data:
-  path: data/raw
-  name: recipes
+  path: data/raw/sequence
+  name: identity
 
 time_channels: 128
 in_channels: 128
 out_channels: 128
 diffusion_steps: 2000
 
-tgt_len: 128  # iwslt14->100 / commengen->54 / cnndm->? / xsum->150
-max_pos_len: 512  # iwslt14->256 / commengen->128 / cnndm->? / xsum->512
+tgt_len: 24  # iwslt14->100 / commengen->54 / cnndm->? / xsum->150
+max_pos_len: 24  # iwslt14->256 / commengen->128 / cnndm->? / xsum->512
 
 src_lang: de
 tgt_lang: en
@@ -65,9 +67,8 @@ num_workers: 4  # bpe->4
 lr_step: 40000
 warmup_steps: 4000
 total_steps: 60000
-batch_size: 4096
 lr: 8e-4
-weight_decay: 0.0
+weight_decay: 0.1
 grad_clip: -1.0
 ema_rate: 0.9999
 grad_accum: 1

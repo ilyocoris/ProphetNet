@@ -40,7 +40,7 @@ class SimpleSinusoidalPositionalEmbedding(nn.Module):
         return self.weight.index_select(0, positions.contiguous().view(-1)).view(positions.size() + (self.embedding_dim,)).detach()
 
 
-class CrossAttention_Diffusion_LM(nn.Module):
+class CrossAttention_Diffusion_LM_OLD(nn.Module):
     def __init__(self, config, out_channels, vocab_size=None):
         super().__init__()
         self.config = config
@@ -224,7 +224,7 @@ class CrossAttention_Diffusion_LM(nn.Module):
 
 
 
-class Vanilla_CrossAttention_Diffusion_LM(nn.Module):
+class CrossAttention_Diffusion_LM(nn.Module):
     def __init__(self, config, out_channels, vocab_size=None):
         super().__init__()
         self.config = config

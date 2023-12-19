@@ -4,28 +4,24 @@ import torch.distributed as dist
 import model_utils.gaussian_diffusion as gd
 
 from model_utils.gaussian_diffusion import GaussianDiffusion
-from model_utils.diffusion_lm import CrossAttention_Diffusion_LM, Vanilla_CrossAttention_Diffusion_LM
+from model_utils.diffusion_lm import CrossAttention_Diffusion_LM
 
 logger = logging.getLogger(__name__)
 
 def create_model(config, vocab_size):
     if dist.get_rank() == 0:
-        logger.info(f'creating model, based on {config.model.mode}')
-        logger.info(f'loading bart {config.load_bart}')
+        # logger.info(f'creating model, based on {config.model.mode}')
+        logger.info(f'creating vanilla model with {config.encoder.layers} encoder layers and {config.denoiser.layers} denoiser layers')
+        logger.info(f'loading encoder pretrained BERT model {config.encoder.initialize_from_pretrained}')
+        # logger.info(f'loading bart {config.load_bart}')
         logger.info(f'rescaling timesteps {config.rescale_timesteps}')
         logger.info(f'using self condition {config.self_condition}')
         logger.info(f'learning time position {config.learn_pos}')
         logger.info(f'fixing encoder {config.fix_encoder}')
 
+
     if config.model.mode == 's2s':
         return CrossAttention_Diffusion_LM(
-            config=config,
-            vocab_size = vocab_size,
-            out_channels=(config.out_channels if not config.learn_sigma else config.out_channels * 2),
-        )
-    elif config.model.mode == 'vanilla':
-        logger.info(f'creating vanilla model with {config.encoder.layers} encoder layers and {config.denoiser.layers} denoiser layers')
-        return Vanilla_CrossAttention_Diffusion_LM(
             config=config,
             vocab_size = vocab_size,
             out_channels=(config.out_channels if not config.learn_sigma else config.out_channels * 2),
