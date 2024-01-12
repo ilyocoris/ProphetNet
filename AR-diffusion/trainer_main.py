@@ -24,11 +24,12 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@hydra.main(version_base=None, config_path=".", config_name="config")
+# @hydra.main(version_base=None, config_path=".", config_name="config")
+@hydra.main(version_base=None, config_path="confs", config_name="config")
 def main(config):
     local_rank = int(os.environ["LOCAL_RANK"])
 
-    config.exp.dir = os.path.join(config.exp.root, config.data.name, config.exp.name)
+    config.exp.dir = os.path.join(config.exp.root, config.dataset.name, config.exp.name)
     if (local_rank == 0) and (not os.path.exists(config.exp.dir)):
         os.makedirs(config.exp.dir)
 
@@ -41,13 +42,13 @@ def main(config):
     if config.tokenizer.from_pretrained:
         tokenizer = AutoTokenizer.from_pretrained(config.tokenizer.name_or_path)
     else:
-        tokenizer = PreTrainedTokenizerFast(tokenizer_file=config.tokenizer)
-        tokenizer.pad_token = "[PAD]"
+        tokenizer = PreTrainedTokenizerFast.from_pretrained(config.tokenizer.name_or_path)
+        tokenizer.pad_token = "PAD"
         
-    # if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
+    # if config.dataset.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
     #     tokenizer = None
     #     if config.use_bpe:
-    #         tokenizer = create_tokenizer(path=f'./data/{config.data.name}/')
+    #         tokenizer = create_tokenizer(path=f'./data/{config.dataset.name}/')
     #     elif config.use_mbert:
     #         tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
     # else:
@@ -60,7 +61,7 @@ def main(config):
     #     vocab_size = config.vocab_size
     # else:
     #     vocab_size = tokenizer.vocab_size
-    #     if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
+    #     if config.dataset.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
     #         if config.use_bpe:
     #             config.pad_value = tokenizer.get_vocab()['<pad>']
     #         # else use by fairseq
@@ -95,12 +96,12 @@ def main(config):
     #     )
     # else:
     
-    # if config.data.name == 'bing_ads':
+    # if config.dataset.name == 'bing_ads':
     #     train_dataloader, dev_dataloader = load_ads_data(
     #         config, tokenizer=tokenizer,
     #     )
 
-    # elif config.data.name == 'pretrain':
+    # elif config.dataset.name == 'pretrain':
     #     dataname_list = ['book1','book2','book3','book4','book5',
     #             'wiki1', 'wiki2', 'wiki3', 'wiki4', 'wiki5',
     #             'stories1','stories2','stories3','stories4','stories5',
@@ -118,7 +119,7 @@ def main(config):
     if dist.get_rank() == 0:
         print("training Diffusion LM model...")
         
-    # if config.data.name == 'pretrain':
+    # if config.dataset.name == 'pretrain':
     #     PretrainLoop(
     #         config=config,
     #         tokenizer=tokenizer,

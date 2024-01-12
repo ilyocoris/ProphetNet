@@ -74,7 +74,7 @@ def split_data(data, log=False):
 @hydra.main(version_base=None, config_path="", config_name="config")
 def main(config):
     local_rank = int(os.environ["LOCAL_RANK"])
-    config.exp.dir = os.path.join(config.exp.root, config.data.name, config.exp.name)
+    config.exp.dir = os.path.join(config.exp.root, config.dataset.name, config.exp.name)
     generate_path = os.path.join(config.exp.dir, str(config.load_step))
     if config.load_from_ema:
         generate_path += ('_ema_' + str(config.ema_rate))
@@ -103,10 +103,10 @@ def main(config):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     # load tokenizer
-    if config.data.name in ['iwslt14', 'iwslt14_tok']:
+    if config.dataset.name in ['iwslt14', 'iwslt14_tok']:
         tokenizer = None
         if config.use_bpe:
-            tokenizer = create_tokenizer(path=f'./data/{config.data.name}/')
+            tokenizer = create_tokenizer(path=f'./data/{config.dataset.name}/')
     else:
         tokenizer = AutoTokenizer.from_pretrained(config.model.name)
     
@@ -114,7 +114,7 @@ def main(config):
         vocab_size = config.vocab_size
     else:
         vocab_size = tokenizer.vocab_size
-        if config.data.name in ['iwslt14', 'iwslt14_tok']:
+        if config.dataset.name in ['iwslt14', 'iwslt14_tok']:
             if config.use_bpe:
                 config.pad_value = tokenizer.get_vocab()['<pad>']
             # else use by fairseq
@@ -162,9 +162,9 @@ def main(config):
         if dist.get_rank() == 0:
             print(f"start generate query from dev dataset, for every passage,\
                 we generate {config.num_samples} querys...")
-            logger.info("***** load " + config.data.name + " dev dataset*****")
+            logger.info("***** load " + config.dataset.name + " dev dataset*****")
             
-        if config.data.name in ['commongen']:
+        if config.dataset.name in ['commongen']:
             dev_data = load_jsonl_data(config, 'dev')
         else:
             dev_data = load_jsonl_data(config, 'test')
@@ -244,7 +244,7 @@ def main(config):
                 logits = model.get_logits(sample)  # (bs, seq_len, vocab_size)
                 sample_id_tensor = torch.argmax(logits, dim=-1)
 
-                if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok'] and (not config.use_mbert):
+                if config.dataset.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok'] and (not config.use_mbert):
                     if config.use_bpe:
                         for sample_id in sample_id_tensor:
                             text = tokenizer.decode(sample_id.tolist(), skip_special_tokens=True)

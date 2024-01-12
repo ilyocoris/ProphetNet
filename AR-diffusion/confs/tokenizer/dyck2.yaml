@@ -1,0 +1,2 @@
+from_pretrained: False
+name_or_path: "data/raw/dyck/tokenizer_dyck2"

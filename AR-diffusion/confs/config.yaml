@@ -1,63 +1,59 @@
+defaults:
+  - dataset: recipes
+  - tokenizer: bert
 
 # Output Path
 exp:
   seed: 101
   root: ./my_output
-  name: eb1_d1_c128_wd01
+  name: eb6_d6_c512
   dir: null
 
-# Data
-data:
-  path: data/raw/modulus
-  name: +
-tgt_len: 8
-max_pos_len: 8
-
 # Training Basics
-batch_size: 256
+batch_size: 32
 device: cuda
 lr_step: 40000
 warmup_steps: 4000
-total_steps: 60000
+total_steps: 200000
 lr: 8e-4
-weight_decay: 0.1
+weight_decay: 1e-5
 grad_clip: -1.0
 ema_rate: 0.9999
-grad_accum: 1
-eval_interval: 3000
-log_interval: 1000
-save_interval: 15000
+grad_accum: 4
+eval_interval: 500
+log_interval: 500
+save_interval: 20000
+
+tgt_len: 128
+max_pos_len: 512
+
 
 # Model
 model:
   mode: s2s
   pretrain: null
 
-tokenizer:
-  from_pretrained: True
-  name_or_path: "bert-base-uncased"
-
 encoder:
   # this will overwrite hidden dim to 768
   initialize_from_pretrained: True
-  layers: 1
-  num_attention_heads: 4
+  layers: 6
+  num_attention_heads: 12
   att_dropout: 0.1
   is_frozen: False # old fix_encoder
 
 denoiser:
-  layers: 1
-  num_attention_heads: 4
+  layers: 6
+  num_attention_heads: 12
   att_dropout: 0.1
 
-time_channels: 128
-in_channels: 128
-out_channels: 128
+time_channels: 512
+in_channels: 512
+out_channels: 512
 diffusion_steps: 2000
 
 vocab_size: 30522
 intermediate_size: 3072
-num_attention_heads: 4
+# num_attention_heads: 4
 hidden_size: 768
 
 # Diffusion

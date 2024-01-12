@@ -76,7 +76,7 @@ class TrainLoop:
             self.optimizer = AdamW(
                 self.master_params, lr=self.lr, weight_decay=self.weight_decay)
         
-        if config.data.name == 'commongen':
+        if config.dataset.name == 'commongen':
             self.scheduler = get_constant_schedule_with_warmup(
                 self.optimizer, 
                 num_warmup_steps=self.warmup_steps

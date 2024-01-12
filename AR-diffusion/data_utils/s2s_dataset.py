@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 def load_jsonl_data(config, attri):
     
     data = []
-    if config.data.name == 'commongen':
-        path = os.path.join(config.data.path, config.data.name, attri + '.jsonl')
+    if config.dataset.name == 'commongen':
+        path = os.path.join(config.dataset.path, config.dataset.name, attri + '.jsonl')
 
         with jsonlines.open(path, 'r') as rp:
             for line in rp:
@@ -34,10 +34,10 @@ def load_jsonl_data(config, attri):
         rp.close()
     
       
-    elif config.data.name in ['qqp', 'quasar_t']:
+    elif config.dataset.name in ['qqp', 'quasar_t']:
         if attri == 'dev':
             attri = 'valid'
-        path = os.path.join(config.data.path, config.data.name, attri + '.jsonl')
+        path = os.path.join(config.dataset.path, config.dataset.name, attri + '.jsonl')
 
         with jsonlines.open(path, 'r') as rp:
             for item in rp:
@@ -47,16 +47,16 @@ def load_jsonl_data(config, attri):
                 })
         rp.close()
 
-    elif config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
+    elif config.dataset.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
         if attri == 'dev':
-            if config.data.name == 'wmt14_hug':
+            if config.dataset.name == 'wmt14_hug':
                 attri = 'validation'
             else:
                 attri = 'valid'
             
         if config.use_bpe:
-            if config.data.name == 'wmt14_hug':
-                path = os.path.join(config.data.path, config.data.name)
+            if config.dataset.name == 'wmt14_hug':
+                path = os.path.join(config.dataset.path, config.dataset.name)
                 raw_data = datasets.load_from_disk(path)[attri]
                 for item in tqdm(raw_data['translation'], desc=attri):
                     data.append({
@@ -64,8 +64,8 @@ def load_jsonl_data(config, attri):
                         'tgt': item[config.tgt_lang].strip('\n')
                     })
             else:
-                path = os.path.join(config.data.path, 
-                                    config.data.name, 
+                path = os.path.join(config.dataset.path, 
+                                    config.dataset.name, 
                                     attri)
                 raw_data = [open(path+'.'+config.src_lang, 'r').readlines(),
                             open(path+'.'+config.tgt_lang, 'r').readlines()]
@@ -81,10 +81,10 @@ def load_jsonl_data(config, attri):
             elif config.fairseq.dist_data:
                 data_attri = 'dist'
                 
-            path = os.path.join(config.data.path, 
-                                f'{config.data.name}_fairseq', 
-                                f'{config.data.name}.{config.src_lang}-{config.tgt_lang}_{data_attri}/')
-            src_dataset, tgt_dataset = load_fairseq(config.data.name, path, attri)
+            path = os.path.join(config.dataset.path, 
+                                f'{config.dataset.name}_fairseq', 
+                                f'{config.dataset.name}.{config.src_lang}-{config.tgt_lang}_{data_attri}/')
+            src_dataset, tgt_dataset = load_fairseq(config.dataset.name, path, attri)
             
             for src, tgt in zip(src_dataset, tgt_dataset):
                 data.append({
@@ -92,9 +92,9 @@ def load_jsonl_data(config, attri):
                     'tgt': tgt
                 })
         
-    elif config.data.name in ['cnn_dm', 'xsum', 'gigaword', 'squad', 'personachat', 'coqa']:
-        src_path = os.path.join(config.data.path, config.data.name, attri + '.src')
-        tgt_path = os.path.join(config.data.path, config.data.name, attri + '.tgt')
+    elif config.dataset.name in ['cnn_dm', 'xsum', 'gigaword', 'squad', 'personachat', 'coqa']:
+        src_path = os.path.join(config.dataset.path, config.dataset.name, attri + '.src')
+        tgt_path = os.path.join(config.dataset.path, config.dataset.name, attri + '.tgt')
 
         src_data = open(src_path, 'r')
         tgt_data = open(tgt_path, 'r')
@@ -108,8 +108,10 @@ def load_jsonl_data(config, attri):
 
     else:
         # Expected a split.src and split.tgt with a sentence to sentence correspondence 
-        src_path = os.path.join(config.data.path, config.data.name, attri + '.src')
-        tgt_path = os.path.join(config.data.path, config.data.name, attri + '.tgt')
+        src_path = os.path.join(config.dataset.path, config.dataset.name, attri + '.src')
+        tgt_path = os.path.join(config.dataset.path, config.dataset.name, attri + '.tgt')
+        # print an ls
+        print(os.listdir("."))
         src_data = open(src_path, 'r')
         tgt_data = open(tgt_path, 'r')
         for src, tgt in zip(src_data, tgt_data):
@@ -130,20 +132,20 @@ def load_jsonl_data(config, attri):
 
 def load_s2s_data(config, tokenizer):
     if dist.get_rank() == 0:
-        logger.info("***** load " + config.data.name + " train dataset *****")
+        logger.info("***** load " + config.dataset.name + " train dataset *****")
         
-    # if 'C4' in config.data.name:
+    # if 'C4' in config.dataset.name:
     #     data = datasets.load_from_disk(
-    #         os.path.join(config.data.path, config.data.name, 'train')
+    #         os.path.join(config.dataset.path, config.dataset.name, 'train')
     #     )
     # else:
     train_data = load_jsonl_data(config, attri='train')
 
     if dist.get_rank() == 0:
-        logger.info("***** load " + config.data.name + " dev dataset *****")
-    # if 'C4' in config.data.name:
+        logger.info("***** load " + config.dataset.name + " dev dataset *****")
+    # if 'C4' in config.dataset.name:
     #     data = datasets.load_from_disk(
-    #         os.path.join(config.data.path, config.data.name, 'dev')
+    #         os.path.join(config.dataset.path, config.dataset.name, 'dev')
     #     )
     # else:
     dev_data = load_jsonl_data(config, attri='dev')
@@ -182,7 +184,7 @@ class S2S_dataset(Dataset):
     def __getitem__(self, index):
         example = self.data[index]
         
-        if self.config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
+        if self.config.dataset.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
             # and (not self.config.use_mbert):
             if self.config.use_bpe:
                 src_input_ids = torch.LongTensor(self.tokenizer.encode(example['src']).ids)
@@ -219,7 +221,7 @@ class S2S_dataset(Dataset):
                 tgt.append(item['tgt'].squeeze())
                 length.append(min(len(item['tgt'].squeeze()), config.tgt_len))
 
-            if config.data.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
+            if config.dataset.name in ['wmt14', 'wmt14_hug', 'iwslt14', 'iwslt14_tok']:
                 # and (not config.use_mbert):
                 src_tensor = pad_sequence(src, batch_first=True, padding_value=config.pad_value)
                 src_tensor = src_tensor[:, :config.max_pos_len]
