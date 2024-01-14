@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Training AR-Diff Debug",
+            "type": "python",
+            "request": "launch",
+            "program":"/home/gcilleru/.local/bin/torchrun",
+            "justMyCode": true,
+            "args": [
+                "--nproc_per_node=2",
+                "--master_port=9421",
+                "--nnodes=1",
+                "${workspaceFolder}/trainer_main.py",
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0,1"
+            }
+        }
+    ],
+    
+    
+}

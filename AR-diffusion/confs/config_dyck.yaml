@@ -36,13 +36,13 @@ model:
 encoder:
   # this will overwrite hidden dim to 768
   initialize_from_pretrained: False
-  layers: 2
+  layers: 1
   num_attention_heads: 4
   att_dropout: 0.1
   is_frozen: False # old fix_encoder
 
 denoiser:
-  layers: 2
+  layers: 6
   num_attention_heads: 4
   att_dropout: 0.1
 

@@ -7,21 +7,21 @@ defaults:
 exp:
   seed: 101
   root: ./my_output
-  name: eb6_d6_c128
+  name: eb6_d6_c512
   dir: null
 
 # Training Basics
-batch_size: 50
+batch_size: 28
 device: cuda
 lr_step: 40000
-warmup_steps: 0 #4000
+warmup_steps: 4000
 total_steps: 200000
 lr: 8e-4
-weight_decay: 0.0
+weight_decay: 1e-5
 grad_clip: -1.0
 ema_rate: 0.9999
 grad_accum: 4
-eval_interval: 2000
+eval_interval: 500
 log_interval: 500
 save_interval: 20000
 
@@ -38,18 +38,18 @@ encoder:
   # this will overwrite hidden dim to 768
   initialize_from_pretrained: True
   layers: 6
-  num_attention_heads: 8
+  num_attention_heads: 12
   att_dropout: 0.1
   is_frozen: False # old fix_encoder
 
 denoiser:
   layers: 6
-  num_attention_heads: 8
+  num_attention_heads: 12
   att_dropout: 0.1
 
-time_channels: 128
-in_channels: 128
-out_channels: 128
+time_channels: 512
+in_channels: 512
+out_channels: 512
 diffusion_steps: 2000
 
 vocab_size: 30522
@@ -88,7 +88,7 @@ scale_embedding: False
 
 continue_train: False
 # TODO: what is this? automatic mixed precision
-use_AMP: True
+use_AMP: False
 grad_penalty: False
 loss_aware: False
 pred_len: False
@@ -100,7 +100,7 @@ pred_len_strategy: null  # token_embed / mean_pool
 att_strategy: txl #null  # txl / rotary / null
 rel_postion: False
 position_att: False
-time_att: True
+time_att: False
 infer_self_condition: False
 self_condition: False
 end_point_scale: 2.0
@@ -111,7 +111,7 @@ num_samples: 1
 ddim_sample: False
 skip_timestep: 100
 
-skip_sample: True
+skip_sample: False
 gen_timesteps: 20
 #*************************************
 
@@ -140,11 +140,11 @@ emb_type: random  # pretrain / random
 
 # generate params
 clip_denoised: False
-load_from_ema: True
+load_from_ema: False
 load_step: 0
 
 # pretrain params
-mask_pro: 0 #0.3
+mask_pro: 0.3
 pre_max_len: 512
 
 add_retrieval_sentences: False
