@@ -15,3 +15,6 @@ future
 sacremoses
 editdistance
 numba
+evaluate
+nltk
+rouge_score
