@@ -5,25 +5,25 @@ defaults:
 
 # Output Path
 exp:
-  seed: 101
+  seed: 367
   root: ./my_output
-  name: eb6_d6_c768_lr8e-4_gc1.0
+  name: eb6ah8_d6_c128_lr2e-4_v2
   dir: null
 
 # Training Basics
 batch_size: 50
 device: cuda
-lr_step: 100000
-warmup_steps: 4000 # 4000 x grad_accum (from paper), thsi is done inside code
+lr_step: 40000
+warmup_steps: 4000 # 4000 x grad_accum (from paper), this is done inside code
 total_steps: 200000
-lr: 8e-4
+lr: 2e-4
 weight_decay: 0.0
-grad_clip: 1.0 #-1.0
+grad_clip: -1.0 #1.0 #-1.0
 ema_rate: 0.9999
 grad_accum: 8
-eval_interval: 2000
+eval_interval: 10000
 log_interval: 500
-save_interval: 20000
+save_interval: 10000
 
 tgt_len: 128
 max_pos_len: 512
@@ -44,12 +44,12 @@ encoder:
 
 denoiser:
   layers: 6
-  num_attention_heads: 8
+  num_attention_heads: 12
   att_dropout: 0.1
 
 time_channels: 128
-in_channels: 768
-out_channels: 768
+in_channels: 128
+out_channels: 128
 diffusion_steps: 2000
 
 vocab_size: 30522
@@ -74,8 +74,6 @@ use_mbert: False  # mt
 use_bpe: False  # mt 
 pad_value: 0  # mt
 num_workers: 4  # bpe->4
-
-# training params
 
 
 #*************************************
@@ -140,7 +138,7 @@ emb_type: random  # pretrain / random
 
 # generate params
 clip_denoised: True
-load_from_ema: True
+load_from_ema: False
 load_step: 0
 
 # pretrain params
