@@ -7,13 +7,13 @@ tokenizer:
 exp:
   seed: 367
   root: ./my_output
-  name: eb6ah8_d6_c128_lr2e-4_v2
+  name: eb6ah8_d6ah8_c256_lr2e-4
   dir: null
 batch_size: 50
 device: cuda
 lr_step: 40000
 warmup_steps: 4000
-total_steps: 200000
+total_steps: 400000
 lr: 0.0002
 weight_decay: 0.0
 grad_clip: -1.0
@@ -35,11 +35,11 @@ encoder:
   is_frozen: false
 denoiser:
   layers: 6
-  num_attention_heads: 12
+  num_attention_heads: 8
   att_dropout: 0.1
 time_channels: 128
-in_channels: 128
-out_channels: 128
+in_channels: 256
+out_channels: 256
 diffusion_steps: 2000
 vocab_size: 30522
 intermediate_size: 3072

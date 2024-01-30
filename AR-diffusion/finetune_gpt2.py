@@ -1,7 +1,7 @@
 # command line call:
-# CUDA_AVALILABLE_DEVICES=1 python3 finetune_gpt2.py
+# CUDA_AVALILABLE_DEVICES=4,6 python3 finetune_gpt2.py
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4,6"
 import torch
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, DataCollatorForLanguageModeling
 from transformers import Trainer, TrainingArguments
@@ -53,7 +53,7 @@ def main():
         output_dir=output_dir,
         overwrite_output_dir=True,
         num_train_epochs=3,
-        per_device_train_batch_size=8, # 200/16
+        per_device_train_batch_size=4, # 200/16
         # gradient_accumulation_steps=4,
         save_steps=10000,
         save_total_limit=-1,

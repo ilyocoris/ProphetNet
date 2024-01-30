@@ -3,3 +3,4 @@ my_output/
 outputs/
 dyck-transformer/
 __pycache__/
+.env
