@@ -27,11 +27,13 @@ def initialize_distributed():
 def main():
     device = 0
     task = "recipes"
-    run = "eb6ah8_d6ah8_c256_lr2e-4"
+    # run = "eb6ah8_d6ah8_c256_lr2e-4"
+    run = "eb6ah8_d6_c128_lr2e-4_v2"
     config_file = f"config_{run}.yaml"
+    dataset_type = "_ar"
     max_data = 1000
-    test_tgt_path = "data/raw/recipes/dev.tgt"
-    test_src_path = "data/raw/recipes/dev.src"
+    test_src_path = "data/raw/recipes/dev_ar_m.src"
+    test_tgt_path = "data/raw/recipes/dev_ar.tgt"
     batch_size = 128
     is_ema = True
 
@@ -40,7 +42,7 @@ def main():
     os.environ['RANK'] = '0'
     os.environ['WORLD_SIZE'] = '1' 
     os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '12359'
+    os.environ['MASTER_PORT'] = '12759'
     initialize_distributed()
 
     # Load config and tokenizer
@@ -49,7 +51,7 @@ def main():
     hydra.initialize(config_path=f"confs")
     config = hydra.compose(config_name=config_file)
 
-    for checkpoint in ["110000", "100000", "90000", "80000", "70000", "60000", "50000", "40000", "30000", "20000", "10000"] :
+    for checkpoint in ["10000", "20000", "30000", "40000", "50000", "60000", "70000", "80000", "90000", "100000", "110000", "120000", "130000", "140000", "150000", "160000", "170000", "180000", "190000", "200000"] :
 
         # Load Tokenizer
         tokenizer = AutoTokenizer.from_pretrained(config.tokenizer.name_or_path)
@@ -149,7 +151,7 @@ def main():
 
             # Save Results
             # create gen folder if it does not exist
-            gen_folder_path = f"my_output/{task}/{run}/gen/dev_{checkpoint}" if not is_ema else f"my_output/{task}/{run}/gen/dev_{checkpoint}_ema"
+            gen_folder_path = f"my_output/{task}/{run}/gen/dev{dataset_type}_{checkpoint}" if not is_ema else f"my_output/{task}/{run}/gen/dev{dataset_type}_{checkpoint}_ema"
             if not os.path.exists(gen_folder_path):
                 os.makedirs(gen_folder_path)
             # save each_sample_list to my_output/recipes/eb6_d6_c128_wd01/gen/dev.gen

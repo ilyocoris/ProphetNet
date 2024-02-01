@@ -1,0 +1,108 @@
+dataset:
+  path: data/raw
+  name: recipes
+tokenizer:
+  from_pretrained: true
+  name_or_path: bert-base-uncased
+exp:
+  seed: 367
+  root: ./my_output
+  name: eb6ah8_d6_c128_lr2e-4_v2
+  dir: null
+batch_size: 50
+device: cuda
+lr_step: 40000
+warmup_steps: 4000
+total_steps: 200000
+lr: 0.0002
+weight_decay: 0.0
+grad_clip: -1.0
+ema_rate: 0.9999
+grad_accum: 8
+eval_interval: 10000
+log_interval: 500
+save_interval: 10000
+tgt_len: 128
+max_pos_len: 512
+model:
+  mode: s2s
+  pretrain: null
+encoder:
+  initialize_from_pretrained: true
+  layers: 6
+  num_attention_heads: 8
+  att_dropout: 0.1
+  is_frozen: false
+denoiser:
+  layers: 6
+  num_attention_heads: 12
+  att_dropout: 0.1
+time_channels: 128
+in_channels: 128
+out_channels: 128
+diffusion_steps: 2000
+vocab_size: 30522
+intermediate_size: 3072
+hidden_size: 768
+schedule_sampler: uniform
+fairseq:
+  use_fairseq: false
+  real_data: false
+  dist_data: false
+use_mbert: false
+use_bpe: false
+pad_value: 0
+num_workers: 4
+clip_scale: 0.0
+use_step_ratio: false
+ratio_thre: 0.7
+label_smooth: 0.0
+scale_embedding: false
+continue_train: false
+use_AMP: true
+grad_penalty: false
+loss_aware: false
+pred_len: false
+length_factor: 0.1
+init_weight: false
+prediction: false
+pred_len_strategy: null
+att_strategy: txl
+rel_postion: false
+position_att: false
+time_att: true
+infer_self_condition: false
+self_condition: false
+end_point_scale: 2.0
+dropout: 0.1
+att_dropout: 0.1
+num_samples: 1
+ddim_sample: false
+skip_timestep: 100
+skip_sample: true
+gen_timesteps: 20
+predict_xstart: true
+rescale_timesteps: true
+resume_checkpoint: true
+shared_embeds: false
+roformer_timeAtt: false
+add_layer_time: false
+use_sentence_piece: false
+load_encoder: false
+predict_x_start: false
+load_bart: false
+use_kl: false
+learn_pos: false
+sigma_small: false
+learn_sigma: false
+rescale_learned_sigmas: false
+logits_mode: 1
+noise_schedule: sqrt
+emb_type: random
+clip_denoised: true
+load_from_ema: false
+load_step: 0
+mask_pro: 0
+pre_max_len: 512
+add_retrieval_sentences: false
+retrieval_top_k: 1
